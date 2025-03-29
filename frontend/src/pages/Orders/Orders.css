@@ -1,0 +1,40 @@
+.orders-page {
+  background-color: var(--light-bg);
+  min-height: calc(100vh - 76px);
+}
+
+.order-card {
+  background: var(--darker-bg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.2s;
+}
+
+.order-card:hover {
+  transform: translateY(-5px);
+}
+
+.order-image {
+  height: 200px;
+  object-fit: cover;
+}
+
+.bid-details {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+}
+
+.bid-details p {
+  margin-bottom: 0.5rem;
+  color: var(--light-text);
+}
+
+.bid-details p:last-child {
+  margin-bottom: 0;
+}
+
+.badge {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+} 

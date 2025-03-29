@@ -1,33 +1,43 @@
 import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaHome, FaGavel, FaHeadset, FaShoppingBag } from 'react-icons/fa';
+import { useAuth } from '../../context/AuthContext';
 
-const NavigationBar = () => {
+const NavBar = () => {
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
   return (
-    <Navbar expand="lg" className="navbar-dark">
+    <Navbar bg="dark" variant="dark" expand="lg">
       <Container>
-        <Navbar.Brand as={Link} to="/">AuctionHub</Navbar.Brand>
+        <Navbar.Brand as={Link} to="/">Auction Site</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link as={Link} to="/" className="d-flex align-items-center">
-              <FaHome className="me-2" /> Home
-            </Nav.Link>
-            <Nav.Link as={Link} to="/bidding" className="d-flex align-items-center">
-              <FaGavel className="me-2" /> Bidding
-            </Nav.Link>
-            <Nav.Link as={Link} to="/my-orders" className="d-flex align-items-center">
-              <FaShoppingBag className="me-2" /> My Orders
-            </Nav.Link>
-            <Nav.Link as={Link} to="/support" className="d-flex align-items-center">
-              <FaHeadset className="me-2" /> Support
-            </Nav.Link>
+            <Nav.Link as={Link} to="/">Home</Nav.Link>
+            <Nav.Link as={Link} to="/bidding">Auctions</Nav.Link>
+            {user && <Nav.Link as={Link} to="/orders">My Bids</Nav.Link>}
           </Nav>
           <Nav>
-            <Nav.Link as={Link} to="/signin">Sign In</Nav.Link>
-            <Nav.Link as={Link} to="/signup" className="btn btn-primary ms-2">Sign Up</Nav.Link>
+            {user ? (
+              <>
+                <span className="navbar-text me-3">
+                  Welcome, {user.firstName}
+                </span>
+                <Button variant="outline-light" onClick={handleLogout}>
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Nav.Link as={Link} to="/signin">Sign In</Nav.Link>
+                <Nav.Link as={Link} to="/signup">Sign Up</Nav.Link>
+              </>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Container>
@@ -35,4 +45,4 @@ const NavigationBar = () => {
   );
 };
 
-export default NavigationBar; 
+export default NavBar; 

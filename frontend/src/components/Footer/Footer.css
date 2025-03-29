@@ -1,0 +1,39 @@
+.footer {
+  background-color: var(--darker-bg);
+  color: var(--light-text);
+  padding: 3rem 0 1rem;
+  margin-top: auto;
+}
+
+.footer h5 {
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+}
+
+.footer ul li {
+  margin-bottom: 0.5rem;
+}
+
+.footer a {
+  color: var(--light-text);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer a:hover {
+  color: var(--primary-color);
+}
+
+.social-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.social-links a {
+  font-size: 1.5rem;
+}
+
+.footer hr {
+  border-color: rgba(255, 255, 255, 0.1);
+  margin: 2rem 0 1rem;
+} 

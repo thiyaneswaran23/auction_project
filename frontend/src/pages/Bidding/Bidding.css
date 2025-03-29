@@ -1,0 +1,43 @@
+.bidding-page {
+  background-color: var(--light-bg);
+  min-height: calc(100vh - 76px);
+}
+
+.item-image {
+  height: 250px;
+  object-fit: cover;
+}
+
+.bid-info {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+
+.bid-info p {
+  margin-bottom: 0.5rem;
+  color: var(--light-text);
+}
+
+.bid-info p:last-child {
+  margin-bottom: 0;
+}
+
+.card {
+  background: var(--darker-bg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card-title {
+  color: var(--light-text);
+}
+
+.card-text {
+  color: var(--gray-text);
+} 

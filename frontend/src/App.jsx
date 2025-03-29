@@ -11,6 +11,7 @@ import SignUp from './pages/SignUp/SignUp';
 import Bidding from './pages/Bidding/Bidding';
 import Orders from './pages/Orders/Orders';
 import Support from './pages/Support/Support';
+import PrivateRoute from './components/PrivateRoute';
 
 function App() {
   return (
@@ -23,7 +24,14 @@ function App() {
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/bidding" element={<Bidding />} />
-            <Route path="/my-orders" element={<Orders />} />
+            <Route
+              path="/orders"
+              element={
+                <PrivateRoute>
+                  <Orders />
+                </PrivateRoute>
+              }
+            />
             <Route path="/support" element={<Support />} />
           </Routes>
         </main>
