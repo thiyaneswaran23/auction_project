@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Button, Form, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Form, Alert, Spinner } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
 import io from 'socket.io-client';
 import api from '../../services/api';
+import { motion } from 'framer-motion';
 import './Bidding.css';
 
 const Bidding = () => {
@@ -15,13 +16,11 @@ const Bidding = () => {
 
   useEffect(() => {
     const socket = io('http://localhost:5000');
-    
+
     const fetchItems = async () => {
       try {
         const response = await api.getItems();
         setItems(response.items || []);
-        
-        // Initialize bid amounts
         const initialBidAmounts = {};
         response.items.forEach(item => {
           initialBidAmounts[item._id] = item.currentPrice + 1;
@@ -36,15 +35,14 @@ const Bidding = () => {
 
     fetchItems();
 
-    // Listen for bid updates
     socket.on('bidUpdate', (data) => {
-      setItems(prevItems => 
-        prevItems.map(item => 
-          item._id === data.itemId 
-            ? { 
-                ...item, 
+      setItems(prevItems =>
+        prevItems.map(item =>
+          item._id === data.itemId
+            ? {
+                ...item,
                 currentPrice: data.currentPrice,
-                highestBidder: data.highestBidder 
+                highestBidder: data.highestBidder
               }
             : item
         )
@@ -59,7 +57,6 @@ const Bidding = () => {
       ...prev,
       [itemId]: value
     }));
-    // Clear any previous error for this item
     setBidErrors(prev => ({
       ...prev,
       [itemId]: ''
@@ -80,8 +77,6 @@ const Bidding = () => {
       }
 
       await api.placeBid(itemId, amount);
-      
-      // Update local state
       setItems(prevItems =>
         prevItems.map(item =>
           item._id === itemId
@@ -89,8 +84,6 @@ const Bidding = () => {
             : item
         )
       );
-
-      // Clear bid error
       setBidErrors(prev => ({
         ...prev,
         [itemId]: ''
@@ -106,9 +99,7 @@ const Bidding = () => {
   if (loading) {
     return (
       <Container className="py-5 text-center">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
+        <Spinner animation="border" variant="primary" />
       </Container>
     );
   }
@@ -122,62 +113,55 @@ const Bidding = () => {
   }
 
   return (
-    <div className="bidding-page">
+    <div className="bidding-page" style={{ background: 'linear-gradient(to right, #2c3e50, #4ca1af)', minHeight: '100vh', color: 'white' }}>
       <Container className="py-5">
-        <h2 className="text-center mb-4">Active Auctions</h2>
+        <motion.h2 className="text-center mb-5 fw-bold" style={{ color: '#fff', fontSize: '2.5rem' }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+          Live Auctions
+        </motion.h2>
         <Row>
           {items.map(item => (
             <Col key={item._id} lg={4} md={6} className="mb-4">
-              <Card className="h-100">
-                <Card.Img 
-                  variant="top" 
-                  src={item.imageUrl} 
-                  className="item-image"
-                />
-                <Card.Body>
-                  <Card.Title>{item.name}</Card.Title>
-                  <Card.Text>{item.description}</Card.Text>
-                  <div className="bid-info">
-                    <p>Current Bid: ${item.currentPrice}</p>
-                    {item.highestBidder === user?._id && (
-                      <p className="text-success">You are the highest bidder!</p>
-                    )}
-                  </div>
-                  {user ? (
-                    <>
-                      <Form.Group className="mb-3">
-                        <Form.Control
-                          type="number"
-                          value={bidAmounts[item._id] || ''}
-                          onChange={(e) => handleBidChange(item._id, e.target.value)}
-                          min={item.currentPrice + 1}
-                          step="1"
-                        />
-                      </Form.Group>
-                      {bidErrors[item._id] && (
-                        <Alert variant="danger" className="mb-3">
-                          {bidErrors[item._id]}
-                        </Alert>
+              <motion.div whileHover={{ scale: 1.03 }}>
+                <Card className="shadow-lg border-0 rounded-4" style={{ background: '#1c1c1e', color: '#fff' }}>
+                  <Card.Img variant="top" src={item.imageUrl} style={{ borderTopLeftRadius: '1rem', borderTopRightRadius: '1rem', maxHeight: '250px', objectFit: 'cover' }} />
+                  <Card.Body>
+                    <Card.Title className="text-center fs-4 fw-semibold">{item.name}</Card.Title>
+                    <Card.Text className="text-center text-muted" style={{ color: '#ccc !important' }}>{item.description}</Card.Text>
+                    <div className="text-center my-3">
+                      <p className="mb-1">Current Bid: <strong>${item.currentPrice}</strong></p>
+                      {item.highestBidder === user?._id && (
+                        <p className="text-success">You are the highest bidder!</p>
                       )}
-                      <Button
-                        variant="primary"
-                        onClick={() => handleBid(item._id)}
-                        className="w-100"
-                      >
-                        Place Bid
+                    </div>
+                    {user ? (
+                      <>
+                        <Form.Group className="mb-3">
+                          <Form.Control
+                            type="number"
+                            className="rounded-pill text-center"
+                            style={{ backgroundColor: '#2f2f2f', border: 'none', color: '#fff' }}
+                            value={bidAmounts[item._id] || ''}
+                            onChange={(e) => handleBidChange(item._id, e.target.value)}
+                            min={item.currentPrice + 1}
+                            step="1"
+                            placeholder="Enter your bid"
+                          />
+                        </Form.Group>
+                        {bidErrors[item._id] && (
+                          <Alert variant="danger">{bidErrors[item._id]}</Alert>
+                        )}
+                        <Button variant="warning" onClick={() => handleBid(item._id)} className="w-100 rounded-pill fw-bold">
+                          Place Bid
+                        </Button>
+                      </>
+                    ) : (
+                      <Button variant="outline-light" href="/signin" className="w-100 rounded-pill">
+                        Sign in to bid
                       </Button>
-                    </>
-                  ) : (
-                    <Button
-                      variant="outline-primary"
-                      href="/signin"
-                      className="w-100"
-                    >
-                      Sign in to bid
-                    </Button>
-                  )}
-                </Card.Body>
-              </Card>
+                    )}
+                  </Card.Body>
+                </Card>
+              </motion.div>
             </Col>
           ))}
         </Row>
@@ -186,4 +170,4 @@ const Bidding = () => {
   );
 };
 
-export default Bidding; 
+export default Bidding;

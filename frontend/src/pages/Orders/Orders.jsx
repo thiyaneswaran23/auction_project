@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Badge, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Card, Badge, Alert, Spinner } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
+import { motion } from 'framer-motion';
 import './Orders.css';
 
 const Orders = () => {
@@ -14,9 +15,9 @@ const Orders = () => {
     const fetchOrders = async () => {
       try {
         const response = await api.getBids();
-        setOrders(response.data || []); // Ensure we always have an array
+        setOrders(response.data || []);
       } catch (error) {
-        setError('Failed to load orders');
+        setError('Failed to load your bids.');
       } finally {
         setLoading(false);
       }
@@ -32,7 +33,9 @@ const Orders = () => {
   if (!user) {
     return (
       <Container className="py-5">
-        <Alert variant="info">Please sign in to view your orders.</Alert>
+        <Alert variant="info" className="text-center">
+          Please sign in to view your bids.
+        </Alert>
       </Container>
     );
   }
@@ -40,9 +43,7 @@ const Orders = () => {
   if (loading) {
     return (
       <Container className="py-5 text-center">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
+        <Spinner animation="border" variant="primary" />
       </Container>
     );
   }
@@ -55,10 +56,10 @@ const Orders = () => {
     );
   }
 
-  if (!orders || orders.length === 0) {
+  if (!orders.length) {
     return (
-      <Container className="py-5">
-        <Alert variant="info">You haven't placed any bids yet.</Alert>
+      <Container className="py-5 text-center">
+        <Alert variant="warning">You haven't placed any bids yet.</Alert>
       </Container>
     );
   }
@@ -66,30 +67,51 @@ const Orders = () => {
   return (
     <div className="orders-page">
       <Container className="py-5">
-        <h2 className="text-center mb-4">My Bids</h2>
+        <motion.h2
+          className="text-center mb-5"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+        >
+          My Bids
+        </motion.h2>
         <Row>
-          {orders.map(order => (
+          {orders.map((order) => (
             <Col key={order._id} lg={4} md={6} className="mb-4">
-              <Card className="h-100 order-card">
-                <Card.Img 
-                  variant="top" 
-                  src={order.itemId.imageUrl} 
-                  className="order-image"
-                />
-                <Card.Body>
-                  <Card.Title>{order.itemId.name}</Card.Title>
-                  <div className="mb-3">
-                    <Badge bg={order.amount === order.itemId.currentPrice ? 'success' : 'warning'}>
-                      {order.amount === order.itemId.currentPrice ? 'Highest Bid' : 'Outbid'}
-                    </Badge>
-                  </div>
-                  <div className="bid-details">
-                    <p>Your Bid: ${order.amount}</p>
-                    <p>Current Price: ${order.itemId.currentPrice}</p>
-                    <p>Status: {order.itemId.status}</p>
-                  </div>
-                </Card.Body>
-              </Card>
+              <motion.div whileHover={{ scale: 1.03 }} className="h-100">
+                <Card className="order-card shadow rounded-4">
+                  <Card.Img
+                    variant="top"
+                    src={order.itemId.imageUrl}
+                    className="order-image"
+                    style={{ height: '220px', objectFit: 'cover', borderTopLeftRadius: '1rem', borderTopRightRadius: '1rem' }}
+                  />
+                  <Card.Body className="d-flex flex-column">
+                    <Card.Title className="text-center">{order.itemId.name}</Card.Title>
+
+                    <div className="text-center my-2">
+                      <Badge
+                        bg={
+                          order.amount === order.itemId.currentPrice
+                            ? 'success'
+                            : 'secondary'
+                        }
+                        className="px-3 py-2 rounded-pill"
+                      >
+                        {order.amount === order.itemId.currentPrice
+                          ? 'Highest Bid'
+                          : 'Outbid'}
+                      </Badge>
+                    </div>
+
+                    <div className="bid-details text-center text-muted small mt-3">
+                      <p className="mb-1">Your Bid: <strong>${order.amount}</strong></p>
+                      <p className="mb-1">Current Price: <strong>${order.itemId.currentPrice}</strong></p>
+                      <p className="mb-0">Status: <em>{order.itemId.status}</em></p>
+                    </div>
+                  </Card.Body>
+                </Card>
+              </motion.div>
             </Col>
           ))}
         </Row>
@@ -98,4 +120,4 @@ const Orders = () => {
   );
 };
 
-export default Orders; 
+export default Orders;
