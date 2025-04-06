@@ -2,16 +2,13 @@ const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/authMiddleware');
 const {
-  placeBid,
-  getBids,
   getItemBids
 } = require('../controllers/bidController');
 const Bid = require('../models/bidModel');
 const Item = require('../models/itemModel');
-const auth = require('../middleware/auth');
 
 // Place a bid
-router.post('/:itemId', auth, async (req, res) => {
+router.post('/:itemId', protect, async (req, res) => {
   try {
     const { amount } = req.body;
     const itemId = req.params.itemId;
@@ -72,7 +69,7 @@ router.post('/:itemId', auth, async (req, res) => {
 });
 
 // Get user's bids
-router.get('/my-bids', auth, async (req, res) => {
+router.get('/my-bids', protect, async (req, res) => {
   try {
     const bids = await Bid.find({ userId: req.user._id })
       .populate({
@@ -88,6 +85,7 @@ router.get('/my-bids', auth, async (req, res) => {
   }
 });
 
+// Get all bids for an item
 router.get('/item/:itemId', getItemBids);
 
-module.exports = router; 
+module.exports = router;
