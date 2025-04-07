@@ -10,7 +10,6 @@ dotenv.config();
 const app = express();
 const httpServer = createServer(app);
 
-// Update CORS configuration
 app.use(cors({
   origin: ['http://localhost:5173', 'http://localhost:5174'],
   credentials: true
@@ -34,17 +33,14 @@ io.on('connection', (socket) => {
 
 app.set('io', io);
 
-// Middleware
 app.use(express.json());
 
-// Routes
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/bids', require('./routes/bidRoutes'));
 app.use('/api/items', require('./routes/itemRoutes'));
 
 const PORT = process.env.PORT || 5000;
 
-// Connect to database and start server
 const startServer = async () => {
   try {
     await connectDB();
@@ -59,7 +55,6 @@ const startServer = async () => {
 
 startServer();
 
-// Error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });

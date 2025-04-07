@@ -7,7 +7,7 @@ const Support = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle message submission here
+   
     setMessage('');
   };
 
